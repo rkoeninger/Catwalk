@@ -10,9 +10,9 @@ final case class Num(x: Double) extends Value
 
 final case class Str(x: String) extends Value
 
-final case class Sym(x: String) extends Value
+final case class Word(x: String) extends Value
 
-final case class Cons(x: Value, y: Value) extends Value
+final case class Pair(x: Value, y: Value) extends Value
 
 final case class Quote(xs: List[Value]) extends Value
 

@@ -45,6 +45,53 @@ object Primitives {
     case (_, Num(x) :: Num(y) :: stack) => Bool(x > y) :: stack
     case _ => throw new StackUnderflowException()
   }
+  val pair: (Environment, List[Value]) => List[Value] = {
+    case (_, x :: y :: stack) => Pair(x, y) :: stack
+    case _ => throw new StackUnderflowException()
+  }
+  val left: (Environment, List[Value]) => List[Value] = {
+    case (_, Pair(x, _) :: stack) => x :: stack
+    case _ => throw new StackUnderflowException()
+  }
+  val right: (Environment, List[Value]) => List[Value] = {
+    case (_, Pair(_, y) :: stack) => y :: stack
+    case _ => throw new StackUnderflowException()
+  }
+  val isEmpty: (Environment, List[Value]) => List[Value] = {
+    case (_, Empty :: stack) => Bool(true) :: stack
+    case (_, _ :: stack) => Bool(false) :: stack
+    case _ => throw new StackUnderflowException()
+  }
+  val isBoolean: (Environment, List[Value]) => List[Value] = {
+    case (_, Bool(_) :: stack) => Bool(true) :: stack
+    case (_, _ :: stack) => Bool(false) :: stack
+    case _ => throw new StackUnderflowException()
+  }
+  val isNumber: (Environment, List[Value]) => List[Value] = {
+    case (_, Num(_) :: stack) => Bool(true) :: stack
+    case (_, _ :: stack) => Bool(false) :: stack
+    case _ => throw new StackUnderflowException()
+  }
+  val isString: (Environment, List[Value]) => List[Value] = {
+    case (_, Str(_) :: stack) => Bool(true) :: stack
+    case (_, _ :: stack) => Bool(false) :: stack
+    case _ => throw new StackUnderflowException()
+  }
+  val isWord: (Environment, List[Value]) => List[Value] = {
+    case (_, Word(_) :: stack) => Bool(true) :: stack
+    case (_, _ :: stack) => Bool(false) :: stack
+    case _ => throw new StackUnderflowException()
+  }
+  val isPair: (Environment, List[Value]) => List[Value] = {
+    case (_, Pair(_, _) :: stack) => Bool(true) :: stack
+    case (_, _ :: stack) => Bool(false) :: stack
+    case _ => throw new StackUnderflowException()
+  }
+  val isQuote: (Environment, List[Value]) => List[Value] = {
+    case (_, Quote(_) :: stack) => Bool(true) :: stack
+    case (_, _ :: stack) => Bool(false) :: stack
+    case _ => throw new StackUnderflowException()
+  }
   val call: (Environment, List[Value]) => List[Value] = {
     case (env, Quote(quote) :: stack) => Evaluator.eval(env, quote, stack)
     case (_, _ :: _) => throw new IllegalStateException("[Quote] required")
