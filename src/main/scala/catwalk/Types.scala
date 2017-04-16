@@ -4,22 +4,24 @@ sealed trait Value
 
 case object Empty extends Value
 
-case class Cons(x: Value, y: Value) extends Value
+final case class Bool(x: Boolean) extends Value
 
-case class Num(x: Int) extends Value
+final case class Num(x: Double) extends Value
 
-case class Str(x: String) extends Value
+final case class Str(x: String) extends Value
 
-case class Sym(x: String) extends Value
+final case class Sym(x: String) extends Value
 
-case class Quote(xs: List[Value]) extends Value
+final case class Cons(x: Value, y: Value) extends Value
+
+final case class Quote(xs: List[Value]) extends Value
 
 sealed trait Verb
 
-case class Native(name: String, body: (Environment, List[Value]) => List[Value]) extends Verb
+final case class Native(name: String, body: (Environment, List[Value]) => List[Value]) extends Verb
 
-case class Definition(name: String, body: List[Value]) extends Verb
+final case class Definition(name: String, body: List[Value]) extends Verb
 
-class Environment(val verbs: Map[String, Verb])
+final class Environment(val verbs: Map[String, Verb])
 
 class StackUnderflowException extends Exception
