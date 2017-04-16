@@ -1,9 +1,12 @@
 package catwalk
 
+import scala.annotation.tailrec
+
 object Evaluator {
+  @tailrec
   def eval(env: Environment, input: List[Value], stack: List[Value]): List[Value] = input match {
     case Nil => stack
-    case Sym(symbol) :: rest => eval(env, rest, app(env, env.verbs(symbol), stack))
+    case Sym(name) :: rest => eval(env, rest, app(env, env verbs name, stack))
     case literal :: rest => eval(env, rest, literal :: stack)
   }
   def app(env: Environment, verb: Verb, stack: List[Value]): List[Value] = verb match {
