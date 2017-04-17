@@ -18,9 +18,9 @@ final case class Quote(xs: List[Value]) extends Value
 
 sealed trait Verb
 
-final case class Native(name: String, body: (Environment, List[Value]) => List[Value]) extends Verb
+final case class Native(body: (Environment, List[Value]) => List[Value]) extends Verb
 
-final case class Definition(name: String, body: List[Value]) extends Verb
+final case class Definition(body: List[Value]) extends Verb
 
 final class Environment(val verbs: Map[String, Verb])
 

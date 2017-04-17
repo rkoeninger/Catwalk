@@ -1,5 +1,8 @@
 package catwalk
 
+import java.lang.Math.pow
+import Evaluator.eval
+
 object Primitives {
   val swap: (Environment, List[Value]) => List[Value] = {
     case (_, x :: y :: stack) => y :: x :: stack
@@ -15,26 +18,26 @@ object Primitives {
   }
   val add: (Environment, List[Value]) => List[Value] = {
     case (_, Num(x) :: Num(y) :: stack) => Num(x + y) :: stack
-    case (_, _ :: _ :: _) => throw new IllegalStateException("[Num, Num] required")
+    case (_, _ :: _ :: _) => throw new IllegalStateException("[Number, Number] required")
     case _ => throw new StackUnderflowException()
   }
   val subtract: (Environment, List[Value]) => List[Value] = {
     case (_, Num(x) :: Num(y) :: stack) => Num(x - y) :: stack
-    case (_, _ :: _ :: _) => throw new IllegalStateException("[Num, Num] required")
+    case (_, _ :: _ :: _) => throw new IllegalStateException("[Number, Number] required")
     case _ => throw new StackUnderflowException()
   }
   val multiply: (Environment, List[Value]) => List[Value] = {
     case (_, Num(x) :: Num(y) :: stack) => Num(x * y) :: stack
-    case (_, _ :: _ :: _) => throw new IllegalStateException("[Num, Num] required")
+    case (_, _ :: _ :: _) => throw new IllegalStateException("[Number, Number] required")
     case _ => throw new StackUnderflowException()
   }
   val divide: (Environment, List[Value]) => List[Value] = {
     case (_, Num(x) :: Num(y) :: stack) => Num(x / y) :: stack
-    case (_, _ :: _ :: _) => throw new IllegalStateException("[Num, Num] required")
+    case (_, _ :: _ :: _) => throw new IllegalStateException("[Number, Number] required")
     case _ => throw new StackUnderflowException()
   }
   val power: (Environment, List[Value]) => List[Value] = {
-    case (_, Num(x) :: Num(y) :: stack) => Num(Math.pow(x, y)) :: stack
+    case (_, Num(x) :: Num(y) :: stack) => Num(pow(x, y)) :: stack
     case _ => throw new StackUnderflowException()
   }
   val equal: (Environment, List[Value]) => List[Value] = {
@@ -93,13 +96,37 @@ object Primitives {
     case _ => throw new StackUnderflowException()
   }
   val call: (Environment, List[Value]) => List[Value] = {
-    case (env, Quote(quote) :: stack) => Evaluator.eval(env, quote, stack)
+    case (env, Quote(quote) :: stack) => eval(env, quote, stack)
     case (_, _ :: _) => throw new IllegalStateException("[Quote] required")
     case _ => throw new StackUnderflowException()
   }
   val `if`: (Environment, List[Value]) => List[Value] = {
     case (_, alternative :: consequent :: Bool(b) :: stack) => (if (b) { consequent } else { alternative }) :: stack
-    case (_, _ :: _ :: _ :: _) => throw new IllegalStateException("[_, _, Bool] required")
+    case (_, _ :: _ :: _ :: _) => throw new IllegalStateException("[_, _, Boolean] required")
     case _ => throw new StackUnderflowException()
   }
+  def apply(): Environment = new Environment(Map[String, Verb](
+    ("swap",      Native(swap)),
+    ("drop",      Native(drop)),
+    ("duplicate", Native(duplicate)),
+    ("add",       Native(add)),
+    ("subtract",  Native(subtract)),
+    ("multiply",  Native(multiply)),
+    ("divide",    Native(divide)),
+    ("power",     Native(power)),
+    ("equal",     Native(equal)),
+    ("greater",   Native(greater)),
+    ("pair",      Native(pair)),
+    ("left",      Native(left)),
+    ("right",     Native(right)),
+    ("isEmpty",   Native(isEmpty)),
+    ("isBoolean", Native(isBoolean)),
+    ("isNumber",  Native(isNumber)),
+    ("isString",  Native(isString)),
+    ("isWord",    Native(isWord)),
+    ("isPair",    Native(isPair)),
+    ("isQuote",   Native(isQuote)),
+    ("call",      Native(call)),
+    ("if",        Native(`if`))
+  ))
 }
