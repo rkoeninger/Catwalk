@@ -8,6 +8,14 @@ object Primitives {
     case (_, x :: y :: stack) => y :: x :: stack
     case _ => throw new StackUnderflowException()
   }
+  val swapThird: (Environment, List[Value]) => List[Value] = {
+    case (_, x :: y :: z :: stack) => z :: y :: x :: stack
+    case _ => throw new StackUnderflowException()
+  }
+  val swapFourth: (Environment, List[Value]) => List[Value] = {
+    case (_, x :: y :: z :: w :: stack) => w :: y :: z :: x :: stack
+    case _ => throw new StackUnderflowException()
+  }
   val drop: (Environment, List[Value]) => List[Value] = {
     case (_, _ :: stack) => stack
     case _ => throw new StackUnderflowException()
@@ -120,29 +128,31 @@ object Primitives {
     case _ => throw new StackUnderflowException()
   }
   def apply(): Environment = new Environment(Map[String, Verb](
-    ("swap",       Native(swap)),
-    ("drop",       Native(drop)),
-    ("duplicate",  Native(duplicate)),
-    ("add",        Native(add)),
-    ("subtract",   Native(subtract)),
-    ("multiply",   Native(multiply)),
-    ("divide",     Native(divide)),
-    ("power",      Native(power)),
-    ("equal",      Native(equal)),
-    ("greater",    Native(greater)),
-    ("pair",       Native(pair)),
-    ("left",       Native(left)),
-    ("right",      Native(right)),
-    ("is empty",   Native(isEmpty)),
-    ("is boolean", Native(isBoolean)),
-    ("is number",  Native(isNumber)),
-    ("is string",  Native(isString)),
-    ("is word",    Native(isWord)),
-    ("is pair",    Native(isPair)),
-    ("is quote",   Native(isQuote)),
-    ("curry",      Native(curry)),
-    ("uncurry",    Native(uncurry)),
-    ("call",       Native(call)),
-    ("if",         Native(`if`))
+    ("swap",        Native(swap)),
+    ("swap third",  Native(swapThird)),
+    ("swap fourth", Native(swapFourth)),
+    ("drop",        Native(drop)),
+    ("duplicate",   Native(duplicate)),
+    ("add",         Native(add)),
+    ("subtract",    Native(subtract)),
+    ("multiply",    Native(multiply)),
+    ("divide",      Native(divide)),
+    ("power",       Native(power)),
+    ("equal",       Native(equal)),
+    ("greater",     Native(greater)),
+    ("pair",        Native(pair)),
+    ("left",        Native(left)),
+    ("right",       Native(right)),
+    ("is empty",    Native(isEmpty)),
+    ("is boolean",  Native(isBoolean)),
+    ("is number",   Native(isNumber)),
+    ("is string",   Native(isString)),
+    ("is word",     Native(isWord)),
+    ("is pair",     Native(isPair)),
+    ("is quote",    Native(isQuote)),
+    ("curry",       Native(curry)),
+    ("uncurry",     Native(uncurry)),
+    ("call",        Native(call)),
+    ("if",          Native(`if`))
   ))
 }
