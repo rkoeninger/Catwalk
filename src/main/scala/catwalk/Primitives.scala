@@ -16,6 +16,18 @@ object Primitives {
     case (_, x :: y :: z :: w :: stack) => w :: y :: z :: x :: stack
     case _ => throw new StackUnderflowException()
   }
+  val pull: (Environment, List[Value]) => List[Value] = {
+    case (_, x :: y :: stack) => y :: x :: stack
+    case _ => throw new StackUnderflowException()
+  }
+  val pullThird: (Environment, List[Value]) => List[Value] = {
+    case (_, x :: y :: z :: stack) => z :: x :: y :: stack
+    case _ => throw new StackUnderflowException()
+  }
+  val pullFourth: (Environment, List[Value]) => List[Value] = {
+    case (_, x :: y :: z :: w :: stack) => w :: x :: y :: z :: stack
+    case _ => throw new StackUnderflowException()
+  }
   val drop: (Environment, List[Value]) => List[Value] = {
     case (_, _ :: stack) => stack
     case _ => throw new StackUnderflowException()
@@ -126,6 +138,9 @@ object Primitives {
     ("swap",        Native(swap)),
     ("swap third",  Native(swapThird)),
     ("swap fourth", Native(swapFourth)),
+    ("pull",        Native(pull)),
+    ("pull third",  Native(pullThird)),
+    ("pull fourth", Native(pullFourth)),
     ("drop",        Native(drop)),
     ("duplicate",   Native(duplicate)),
     ("add",         Native(add)),
