@@ -62,13 +62,8 @@ object Primitives {
     case (_, x :: y :: stack) => Pair(x, y) :: stack
     case _ => throw new StackUnderflowException()
   }
-  val left: (Environment, List[Value]) => List[Value] = {
-    case (_, Pair(x, _) :: stack) => x :: stack
-    case (_, _ :: _) => throw new IllegalStateException("[Pair, ...] required")
-    case _ => throw new StackUnderflowException()
-  }
-  val right: (Environment, List[Value]) => List[Value] = {
-    case (_, Pair(_, x) :: stack) => x :: stack
+  val split: (Environment, List[Value]) => List[Value] = {
+    case (_, Pair(x, y) :: stack) => x :: y :: stack
     case (_, _ :: _) => throw new IllegalStateException("[Pair, ...] required")
     case _ => throw new StackUnderflowException()
   }
@@ -141,8 +136,7 @@ object Primitives {
     ("equal",       Native(equal)),
     ("greater",     Native(greater)),
     ("pair",        Native(pair)),
-    ("left",        Native(left)),
-    ("right",       Native(right)),
+    ("split",       Native(split)),
     ("is empty",    Native(isEmpty)),
     ("is boolean",  Native(isBoolean)),
     ("is number",   Native(isNumber)),
