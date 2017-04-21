@@ -22,6 +22,8 @@ final case class Native(body: (Environment, List[Value]) => List[Value]) extends
 
 final case class Definition(body: List[Value]) extends Verb
 
-final class Environment(val verbs: Map[String, Verb])
+final class Environment(val verbs: Map[String, Verb]) {
+  def define(name: String, verb: Verb) = new Environment(verbs + (name -> verb))
+}
 
 class StackUnderflowException extends Exception
