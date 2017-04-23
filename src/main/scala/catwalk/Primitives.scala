@@ -79,11 +79,6 @@ object Primitives {
     case (_, _ :: _) => throw new IllegalStateException("[Pair, ...] required")
     case _ => throw new StackUnderflowException()
   }
-  val isEmpty: (Environment, List[Value]) => List[Value] = {
-    case (_, Empty :: stack) => Bool(true) :: stack
-    case (_, _ :: stack) => Bool(false) :: stack
-    case _ => throw new StackUnderflowException()
-  }
   val isBoolean: (Environment, List[Value]) => List[Value] = {
     case (_, Bool(_) :: stack) => Bool(true) :: stack
     case (_, _ :: stack) => Bool(false) :: stack
@@ -152,7 +147,6 @@ object Primitives {
     ("greater",     Native(greater)),
     ("pair",        Native(pair)),
     ("split",       Native(split)),
-    ("is empty",    Native(isEmpty)),
     ("is boolean",  Native(isBoolean)),
     ("is number",   Native(isNumber)),
     ("is string",   Native(isString)),

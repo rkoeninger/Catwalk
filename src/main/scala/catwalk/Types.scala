@@ -2,8 +2,6 @@ package catwalk
 
 sealed trait Value
 
-case object Empty extends Value
-
 final case class Bool(x: Boolean) extends Value
 
 final case class Num(x: Double) extends Value
