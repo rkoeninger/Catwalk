@@ -79,9 +79,9 @@ object Primitives {
     case (_, _ :: _) => throw new IllegalStateException("[Pair, ...] required")
     case _ => throw new StackUnderflowException()
   }
-  val isBoolean: (Environment, List[Value]) => List[Value] = {
-    case (_, Bool(_) :: stack) => Bool(true) :: stack
-    case (_, _ :: stack) => Bool(false) :: stack
+  val isBoolean: (Environment, List[Value]) => (Environment, List[Value]) = {
+    case (env, Bool(_) :: stack) => (env, Bool(true) :: stack)
+    case (env, _ :: stack) => (env, Bool(false) :: stack)
     case _ => throw new StackUnderflowException()
   }
   val isNumber: (Environment, List[Value]) => (Environment, List[Value]) = {
