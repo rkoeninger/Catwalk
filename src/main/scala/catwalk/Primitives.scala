@@ -127,6 +127,22 @@ object Primitives {
     case (_, _ :: _ :: _ :: _) => throw new IllegalStateException("[Value, Value, Boolean, ...] required")
     case _ => throw new StackUnderflowException()
   }
+  val `try`: (Environment, List[Value]) => (Environment, List[Value]) = {
+    case (env, Quote(handler) :: Quote(body) :: rest) =>
+      try
+        eval(env, body, rest)
+      catch {
+        case e: Exception => eval(env, handler, Str(e.getMessage) :: rest)
+      }
+    case (_, _ :: _ :: _) => throw new IllegalStateException("[Quote, Quote, ...] required")
+    case _ => throw new StackUnderflowException()
+  }
+  // TODO: include new env in exception?
+  val `throw`: (Environment, List[Value]) => (Environment, List[Value]) = {
+    case (_, Str(message) :: _) => throw new Exception(message)
+    case (_, _ :: _) => throw new IllegalStateException("[String, ...] required")
+    case _ => throw new StackUnderflowException()
+  }
   def apply(): Environment = new Environment(Evaluate, Map[String, Verb](
     ("swap",        Native(swap)),
     ("swap third",  Native(swapThird)),
