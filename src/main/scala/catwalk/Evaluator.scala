@@ -14,15 +14,14 @@ object Evaluator {
     }
     case CollectQuote => input match {
       case Nil => (env, stack)
-      case Word("end-quote") :: rest => eval(env setMode Evaluate, rest, stack)
+      case Word("end quote") :: rest => eval(env setMode Evaluate, rest, stack)
       case word :: rest => stack match {
-        case Quote(q) :: restStack => eval(env, rest, Quote(word :: q) :: restStack)
+        case Quote(q) :: restStack => eval(env, rest, Quote(q :+ word) :: restStack)
         case _ :: _ => throw new IllegalStateException("[Quote, ...] required")
         case _ => throw new StackUnderflowException()
       }
     }
   }
-
   def app(env: Environment, verb: Verb, stack: List[Value]): (Environment, List[Value]) = verb match {
     case Native(f) => f(env, stack)
     case Definition(body) => eval(env, body, stack)
