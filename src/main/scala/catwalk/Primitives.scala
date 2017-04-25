@@ -169,6 +169,8 @@ object Primitives {
     ("curry",       Native(curry)),
     ("quote",       Native(quote)),
     ("call",        Native(call)),
-    ("if",          Native(`if`))
+    ("if",          Native(`if`)),
+    ("try",         Native(`try`)),
+    ("throw",       Native(`throw`))
   ))
 }
