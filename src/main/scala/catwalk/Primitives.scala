@@ -115,15 +115,14 @@ object Primitives {
     case _ => throw new StackUnderflowException()
   }
   val quote: (Environment, List[Value]) => (Environment, List[Value]) =
-    (env, stack) => (env setMode CollectQuote, Quote(List()) :: stack)
+    (env, stack) => (env, Quote(List()) :: stack)
   val call: (Environment, List[Value]) => (Environment, List[Value]) = {
     case (env, Quote(q) :: stack) => eval(env, q, stack)
     case (_, _ :: _) => throw new IllegalStateException("[Quote, ...] required")
     case _ => throw new StackUnderflowException()
   }
   val `if`: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (env, alternative :: consequent :: Bool(b) :: stack) =>
-      (env, (if (b) { consequent } else { alternative }) :: stack)
+    case (env, y :: x :: Bool(b) :: stack) => (env, (if (b) x else y) :: stack)
     case (_, _ :: _ :: _ :: _) => throw new IllegalStateException("[Value, Value, Boolean, ...] required")
     case _ => throw new StackUnderflowException()
   }
@@ -143,7 +142,7 @@ object Primitives {
     case (_, _ :: _) => throw new IllegalStateException("[String, ...] required")
     case _ => throw new StackUnderflowException()
   }
-  def apply(): Environment = new Environment(Evaluate, Map[String, Verb](
+  def apply(): Environment = new Environment(Map[String, Verb](
     ("swap",        Native(swap)),
     ("swap third",  Native(swapThird)),
     ("swap fourth", Native(swapFourth)),

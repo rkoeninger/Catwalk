@@ -20,21 +20,8 @@ final case class Native(body: (Environment, List[Value]) => (Environment, List[V
 
 final case class Definition(body: List[Value]) extends Verb
 
-sealed trait Mode
-
-/**
-  * Interpret input by applying verbs and pushing literals on top of the stack.
-  */
-case object Evaluate extends Mode
-
-/**
-  * Interpret input by cons'ing words onto quote on top of the stack.
-  */
-case object CollectQuote extends Mode
-
-final class Environment(val mode: Mode, val verbs: Map[String, Verb]) {
-  def define(name: String, verb: Verb) = new Environment(mode, verbs + (name -> verb))
-  def setMode(mode: Mode) = new Environment(mode, verbs)
+final class Environment(val verbs: Map[String, Verb]) {
+  def define(name: String, verb: Verb) = new Environment(verbs + (name -> verb))
 }
 
 class StackUnderflowException extends Exception
