@@ -130,14 +130,13 @@ object Primitives {
       try
         eval(body, State(verbs, stack))
       catch {
-        // TODO: handle EvaluationException specifically?
         case e: Exception => eval(handler, State(verbs, Str(e.getMessage) :: stack))
       }
     case State(_, _ :: _ :: _) => throw new UnexpectedStackException(List("Quote", "Quote"))
     case _ => throw new StackUnderflowException()
   })
   val `throw`: Verb = Native({
-    case State(verbs, Str(message) :: stack) => throw new EvaluationException(message, State(verbs, stack))
+    case State(_, Str(message) :: _) => throw new Exception(message)
     case State(_, _:: _) => throw new UnexpectedStackException(List("String"))
     case _ => throw new StackUnderflowException()
   })

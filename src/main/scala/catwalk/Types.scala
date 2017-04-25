@@ -31,9 +31,6 @@ final case class State(verbs: Map[String, Verb], stack: List[Value]) {
   def push(value: Value) = State(verbs, value :: stack)
 }
 
-class EvaluationException(message: String, val state: State) extends Exception(message)
-
-// TODO: make this an EvaluationException?
 class UnexpectedStackException(top: List[String]) extends Exception(s"[${top.mkString(", ")}] expected")
 
 class StackUnderflowException extends Exception
