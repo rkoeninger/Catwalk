@@ -16,12 +16,19 @@ final case class Quote(xs: List[Value]) extends Value
 
 sealed trait Verb
 
-final case class Native(body: (Environment, List[Value]) => (Environment, List[Value])) extends Verb
+final case class Native(body: State => State) extends Verb
 
 final case class Definition(body: List[Value]) extends Verb
 
-final class Environment(val verbs: Map[String, Verb]) {
-  def define(name: String, verb: Verb) = new Environment(verbs + (name -> verb))
+object Pure {
+  def apply(f: List[Value] => List[Value]): State => State = {
+    case State(verbs, stack) => State(verbs, f(stack))
+  }
+}
+
+final case class State(verbs: Map[String, Verb], stack: List[Value]) {
+  def define(name: String, verb: Verb) = State(verbs + (name -> verb), stack)
+  def push(value: Value) = State(verbs, value :: stack)
 }
 
 class StackUnderflowException extends Exception

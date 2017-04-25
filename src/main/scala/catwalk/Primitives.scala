@@ -4,145 +4,144 @@ import java.lang.Math.pow
 import Evaluator.eval
 
 object Primitives {
-  val swap: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (env, x :: y :: stack) => (env, y :: x :: stack)
+  val swap: State => State = Pure({
+    case x :: y :: stack => y :: x :: stack
+    case _ => throw new StackUnderflowException()
+  })
+  val swapThird: State => State = Pure({
+    case x :: y :: z :: stack => z :: y :: x :: stack
+    case _ => throw new StackUnderflowException()
+  })
+  val swapFourth: State => State = Pure({
+    case x :: y :: z :: w :: stack => w :: y :: z :: x :: stack
+    case _ => throw new StackUnderflowException()
+  })
+  val pull: State => State = Pure({
+    case x :: y :: stack => y :: x :: stack
+    case _ => throw new StackUnderflowException()
+  })
+  val pullThird: State => State = Pure({
+    case x :: y :: z :: stack => z :: x :: y :: stack
+    case _ => throw new StackUnderflowException()
+  })
+  val pullFourth: State => State = Pure({
+    case x :: y :: z :: w :: stack => w :: x :: y :: z :: stack
+    case _ => throw new StackUnderflowException()
+  })
+  val drop: State => State = Pure({
+    case _ :: stack => stack
+    case _ => throw new StackUnderflowException()
+  })
+  val duplicate: State => State = Pure({
+    case x :: stack => x :: x :: stack
+    case _ => throw new StackUnderflowException()
+  })
+  val add: State => State = Pure({
+    case Num(x) :: Num(y) :: stack => Num(x + y) :: stack
+    case _ :: _ :: _ => throw new IllegalStateException("[Number, Number, ...] required")
+    case _ => throw new StackUnderflowException()
+  })
+  val subtract: State => State = Pure({
+    case Num(x) :: Num(y) :: stack => Num(x - y) :: stack
+    case _ :: _ :: _ => throw new IllegalStateException("[Number, Number, ...] required")
+    case _ => throw new StackUnderflowException()
+  })
+  val multiply: State => State = Pure({
+    case Num(x) :: Num(y) :: stack => Num(x * y) :: stack
+    case _ :: _ :: _ => throw new IllegalStateException("[Number, Number, ...] required")
+    case _ => throw new StackUnderflowException()
+  })
+  val divide: State => State = Pure({
+    case Num(x) :: Num(y) :: stack => Num(x / y) :: stack
+    case _ :: _ :: _ => throw new IllegalStateException("[Number, Number, ...] required")
+    case _ => throw new StackUnderflowException()
+  })
+  val power: State => State = Pure({
+    case Num(x) :: Num(y) :: stack => Num(pow(x, y)) :: stack
+    case _ :: _ :: _ => throw new IllegalStateException("[Number, Number, ...] required")
+    case _ => throw new StackUnderflowException()
+  })
+  val equal: State => State = Pure({
+    case x :: y :: stack => Bool(x == y) :: stack
+    case _ => throw new StackUnderflowException()
+  })
+  val greater: State => State = Pure({
+    case Num(x) :: Num(y) :: stack => Bool(x > y) :: stack
+    case _ :: _ :: _ => throw new IllegalStateException("[Number, Number, ...] required")
+    case _ => throw new StackUnderflowException()
+  })
+  val pair: State => State = Pure({
+    case x :: y :: stack => Pair(x, y) :: stack
+    case _ => throw new StackUnderflowException()
+  })
+  val split: State => State = Pure({
+    case Pair(x, y) :: stack => x :: y :: stack
+    case _ :: _ => throw new IllegalStateException("[Pair, ...] required")
+    case _ => throw new StackUnderflowException()
+  })
+  val isBoolean: State => State = Pure({
+    case Bool(_) :: stack => Bool(true) :: stack
+    case _ :: stack => Bool(false) :: stack
+    case _ => throw new StackUnderflowException()
+  })
+  val isNumber: State => State = Pure({
+    case Num(_) :: stack => Bool(true) :: stack
+    case _ :: stack => Bool(false) :: stack
+    case _ => throw new StackUnderflowException()
+  })
+  val isString: State => State = Pure({
+    case Str(_) :: stack => Bool(true) :: stack
+    case _ :: stack => Bool(false) :: stack
+    case _ => throw new StackUnderflowException()
+  })
+  val isWord: State => State = Pure({
+    case Word(_) :: stack => Bool(true) :: stack
+    case _ :: stack => Bool(false) :: stack
+    case _ => throw new StackUnderflowException()
+  })
+  val isPair: State => State = Pure({
+    case Pair(_, _) :: stack => Bool(true) :: stack
+    case _ :: stack => Bool(false) :: stack
+    case _ => throw new StackUnderflowException()
+  })
+  val isQuote: State => State = Pure({
+    case Quote(_) :: stack => Bool(true) :: stack
+    case _ :: stack => Bool(false) :: stack
+    case _ => throw new StackUnderflowException()
+  })
+  val curry: State => State = Pure({
+    case x :: Quote(q) :: stack => Quote(x :: q) :: stack
+    case _ :: _ :: _ => throw new IllegalStateException("[Value, Quote, ...] required")
+    case _ => throw new StackUnderflowException()
+  })
+  val quote: State => State = Pure(stack => Quote(List()) :: stack)
+  val call: State => State = {
+    case State(verbs, Quote(q) :: stack) => eval(q, State(verbs, stack))
+    case State(_, _ :: _) => throw new IllegalStateException("[Quote, ...] required")
     case _ => throw new StackUnderflowException()
   }
-  val swapThird: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (env, x :: y :: z :: stack) => (env, z :: y :: x :: stack)
+  val `if`: State => State = Pure({
+    case y :: x :: Bool(b) :: stack => (if (b) x else y) :: stack
+    case _ :: _ :: _ :: _ => throw new IllegalStateException("[Value, Value, Boolean, ...] required")
     case _ => throw new StackUnderflowException()
-  }
-  val swapFourth: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (env, x :: y :: z :: w :: stack) => (env, w :: y :: z :: x :: stack)
-    case _ => throw new StackUnderflowException()
-  }
-  val pull: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (env, x :: y :: stack) => (env, y :: x :: stack)
-    case _ => throw new StackUnderflowException()
-  }
-  val pullThird: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (env, x :: y :: z :: stack) => (env, z :: x :: y :: stack)
-    case _ => throw new StackUnderflowException()
-  }
-  val pullFourth: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (env, x :: y :: z :: w :: stack) => (env, w :: x :: y :: z :: stack)
-    case _ => throw new StackUnderflowException()
-  }
-  val drop: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (env, _ :: stack) => (env, stack)
-    case _ => throw new StackUnderflowException()
-  }
-  val duplicate: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (env, x :: stack) => (env, x :: x :: stack)
-    case _ => throw new StackUnderflowException()
-  }
-  val add: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (env, Num(x) :: Num(y) :: stack) => (env, Num(x + y) :: stack)
-    case (_, _ :: _ :: _) => throw new IllegalStateException("[Number, Number, ...] required")
-    case _ => throw new StackUnderflowException()
-  }
-  val subtract: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (env, Num(x) :: Num(y) :: stack) => (env, Num(x - y) :: stack)
-    case (_, _ :: _ :: _) => throw new IllegalStateException("[Number, Number, ...] required")
-    case _ => throw new StackUnderflowException()
-  }
-  val multiply: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (env, Num(x) :: Num(y) :: stack) => (env, Num(x * y) :: stack)
-    case (_, _ :: _ :: _) => throw new IllegalStateException("[Number, Number, ...] required")
-    case _ => throw new StackUnderflowException()
-  }
-  val divide: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (env, Num(x) :: Num(y) :: stack) => (env, Num(x / y) :: stack)
-    case (_, _ :: _ :: _) => throw new IllegalStateException("[Number, Number, ...] required")
-    case _ => throw new StackUnderflowException()
-  }
-  val power: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (env, Num(x) :: Num(y) :: stack) => (env, Num(pow(x, y)) :: stack)
-    case (_, _ :: _ :: _) => throw new IllegalStateException("[Number, Number, ...] required")
-    case _ => throw new StackUnderflowException()
-  }
-  val equal: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (env, x :: y :: stack) => (env, Bool(x == y) :: stack)
-    case _ => throw new StackUnderflowException()
-  }
-  val greater: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (env, Num(x) :: Num(y) :: stack) => (env, Bool(x > y) :: stack)
-    case (_, _ :: _ :: _) => throw new IllegalStateException("[Number, Number, ...] required")
-    case _ => throw new StackUnderflowException()
-  }
-  val pair: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (env, x :: y :: stack) => (env, Pair(x, y) :: stack)
-    case _ => throw new StackUnderflowException()
-  }
-  val split: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (env, Pair(x, y) :: stack) => (env, x :: y :: stack)
-    case (_, _ :: _) => throw new IllegalStateException("[Pair, ...] required")
-    case _ => throw new StackUnderflowException()
-  }
-  val isBoolean: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (env, Bool(_) :: stack) => (env, Bool(true) :: stack)
-    case (env, _ :: stack) => (env, Bool(false) :: stack)
-    case _ => throw new StackUnderflowException()
-  }
-  val isNumber: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (env, Num(_) :: stack) => (env, Bool(true) :: stack)
-    case (env, _ :: stack) => (env, Bool(false) :: stack)
-    case _ => throw new StackUnderflowException()
-  }
-  val isString: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (env, Str(_) :: stack) => (env, Bool(true) :: stack)
-    case (env, _ :: stack) => (env, Bool(false) :: stack)
-    case _ => throw new StackUnderflowException()
-  }
-  val isWord: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (env, Word(_) :: stack) => (env, Bool(true) :: stack)
-    case (env, _ :: stack) => (env, Bool(false) :: stack)
-    case _ => throw new StackUnderflowException()
-  }
-  val isPair: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (env, Pair(_, _) :: stack) => (env, Bool(true) :: stack)
-    case (env, _ :: stack) => (env, Bool(false) :: stack)
-    case _ => throw new StackUnderflowException()
-  }
-  val isQuote: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (env, Quote(_) :: stack) => (env, Bool(true) :: stack)
-    case (env, _ :: stack) => (env, Bool(false) :: stack)
-    case _ => throw new StackUnderflowException()
-  }
-  val curry: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (env, x :: Quote(q) :: stack) => (env, Quote(x :: q) :: stack)
-    case (_, _ :: _ :: _) => throw new IllegalStateException("[Value, Quote, ...] required")
-    case _ => throw new StackUnderflowException()
-  }
-  val quote: (Environment, List[Value]) => (Environment, List[Value]) =
-    (env, stack) => (env, Quote(List()) :: stack)
-  val call: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (env, Quote(q) :: stack) => eval(env, q, stack)
-    case (_, _ :: _) => throw new IllegalStateException("[Quote, ...] required")
-    case _ => throw new StackUnderflowException()
-  }
-  val `if`: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (env, y :: x :: Bool(b) :: stack) => (env, (if (b) x else y) :: stack)
-    case (_, _ :: _ :: _ :: _) => throw new IllegalStateException("[Value, Value, Boolean, ...] required")
-    case _ => throw new StackUnderflowException()
-  }
-  val `try`: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (env, Quote(handler) :: Quote(body) :: rest) =>
+  })
+  val `try`: State => State = {
+    case State(verbs, Quote(handler) :: Quote(body) :: stack) =>
       try
-        eval(env, body, rest)
+        eval(body, State(verbs, stack))
       catch {
-        case e: Exception => eval(env, handler, Str(e.getMessage) :: rest)
+        case e: Exception => eval(handler, State(verbs, Str(e.getMessage) :: stack))
       }
-    case (_, _ :: _ :: _) => throw new IllegalStateException("[Quote, Quote, ...] required")
+    case State(_, _ :: _ :: _) => throw new IllegalStateException("[Quote, Quote, ...] required")
     case _ => throw new StackUnderflowException()
   }
   // TODO: include new env in exception?
-  val `throw`: (Environment, List[Value]) => (Environment, List[Value]) = {
-    case (_, Str(message) :: _) => throw new Exception(message)
-    case (_, _ :: _) => throw new IllegalStateException("[String, ...] required")
+  val `throw`: State => State = Pure({
+    case Str(message) :: _ => throw new Exception(message)
+    case _ :: _ => throw new IllegalStateException("[String, ...] required")
     case _ => throw new StackUnderflowException()
-  }
-  def apply(): Environment = new Environment(Map[String, Verb](
+  })
+  def apply(): Map[String, Verb] = Map[String, Verb](
     ("swap",        Native(swap)),
     ("swap third",  Native(swapThird)),
     ("swap fourth", Native(swapFourth)),
@@ -172,5 +171,5 @@ object Primitives {
     ("if",          Native(`if`)),
     ("try",         Native(`try`)),
     ("throw",       Native(`throw`))
-  ))
+  )
 }
